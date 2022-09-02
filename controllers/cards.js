@@ -5,6 +5,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN,
 } = require('../utils/status-codes');
 
 function getCards(req, res) {
@@ -27,6 +28,11 @@ function createCard(req, res) {
 }
 
 function deleteCard(req, res) {
+  const card = Card.findById(req.params.cardId);
+  if (req.user._id !== card.owner._id) {
+    res.status(FORBIDDEN).send({ message: 'Нельзя удалить чужую карточку' });
+    return;
+  }
   Card.findByIdAndRemove(req.params.cardId)
     .then(res.status(NO_CONTENT))
     .catch((err) => {
@@ -44,7 +50,7 @@ function likeCard(req, res) {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then(res.status(OK))
+    .then((card) => res.status(OK).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
@@ -64,7 +70,7 @@ function dislikeCard(req, res) {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then(res.status(OK))
+    .then((card) => res.status(OK).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });

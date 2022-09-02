@@ -3,6 +3,7 @@ const NO_CONTENT = 204;
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
+const FORBIDDEN = 403;
 
 module.exports = {
   OK,
@@ -10,4 +11,5 @@ module.exports = {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN,
 };
