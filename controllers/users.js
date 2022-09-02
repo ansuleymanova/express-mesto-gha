@@ -1,26 +1,32 @@
 const User = require('../models/user');
 const {
   OK,
-  INCORRECT_DATA,
+  BAD_REQUEST,
   NOT_FOUND,
-  GENERAL_ERROR,
-} = require('./status-codes');
+  INTERNAL_SERVER_ERROR,
+} = require('../utils/status-codes');
 
 function getUsers(req, res) {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(GENERAL_ERROR).send({ message: 'Error' }));
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' }));
 }
 
 function getUser(req, res) {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        res.status(NOT_FOUND).send({ message: 'Такого пользователя нет' });
+        return;
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(NOT_FOUND).send({ message: 'Такого пользователя нет' });
         return;
       }
-      res.status(GENERAL_ERROR).send({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
     });
 }
 
@@ -30,16 +36,20 @@ function createUser(req, res) {
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA).send({ message: 'Переданы некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
-      res.status(GENERAL_ERROR).send({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
     });
 }
 
 function patchUser(req, res) {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -47,10 +57,10 @@ function patchUser(req, res) {
         return;
       }
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA).send({ message: 'Переданы некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
-      res.status(GENERAL_ERROR).send({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
     });
 }
 
@@ -68,10 +78,10 @@ function patchAvatar(req, res) {
         return;
       }
       if (err.name === 'ValidationError') {
-        res.status(INCORRECT_DATA).send({ message: 'Переданы некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
-      res.status(GENERAL_ERROR).send({ message: err.message });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
     });
 }
 
