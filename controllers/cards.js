@@ -1,7 +1,6 @@
 const Card = require('../models/card');
 const {
   OK,
-  NO_CONTENT,
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
@@ -28,10 +27,16 @@ function createCard(req, res) {
 
 function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(res.status(NO_CONTENT).send({}))
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
+        return;
+      }
+      res.status(OK).send({});
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
@@ -52,7 +57,7 @@ function likeCard(req, res) {
       res.status(OK).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
@@ -74,7 +79,7 @@ function dislikeCard(req, res) {
       res.status(OK).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
