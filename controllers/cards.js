@@ -5,7 +5,6 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
-  FORBIDDEN,
 } = require('../utils/status-codes');
 
 function getCards(req, res) {
@@ -28,11 +27,6 @@ function createCard(req, res) {
 }
 
 function deleteCard(req, res) {
-  const card = Card.findById(req.params.cardId);
-  if (req.user._id !== card.owner._id) {
-    res.status(FORBIDDEN).send({ message: 'Нельзя удалить чужую карточку' });
-    return;
-  }
   Card.findByIdAndRemove(req.params.cardId)
     .then(res.status(NO_CONTENT))
     .catch((err) => {
@@ -50,14 +44,16 @@ function likeCard(req, res) {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(OK).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
         return;
       }
-      if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
+      res.status(OK).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
       res.send({ message: err.message });
@@ -70,14 +66,16 @@ function dislikeCard(req, res) {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(OK).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+    .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
         return;
       }
-      if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
+      res.status(OK).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
       res.send({ message: err.message });
