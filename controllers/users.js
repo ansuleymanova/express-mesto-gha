@@ -23,7 +23,7 @@ function getUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Такого пользователя нет' });
+        res.status(BAD_REQUEST).send({ message: 'Такого пользователя нет' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
