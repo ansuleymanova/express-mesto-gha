@@ -28,7 +28,7 @@ function createCard(req, res) {
 
 function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(res.status(NO_CONTENT))
+    .then(res.status(NO_CONTENT).send({}))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });

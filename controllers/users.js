@@ -8,7 +8,7 @@ const {
 
 function getUsers(req, res) {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.status(OK).send(users))
     .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' }));
 }
 
