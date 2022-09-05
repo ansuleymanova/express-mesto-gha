@@ -8,7 +8,7 @@ const {
 
 function getUsers(req, res) {
   User.find({})
-    .then((users) => res.status(OK).send(users))
+    .then((users) => res.send(users))
     .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' }));
 }
 
@@ -23,7 +23,7 @@ function getUser(req, res) {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Такого пользователя нет' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
@@ -50,13 +50,15 @@ function patchUser(req, res) {
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.status(OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
+    .then((user) => {
+      if (!user) {
         res.status(NOT_FOUND).send({ message: 'Такого пользователя нет' });
         return;
       }
-      if (err.name === 'ValidationError') {
+      res.status(OK).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }
@@ -71,13 +73,15 @@ function patchAvatar(req, res) {
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.status(OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
+    .then((user) => {
+      if (!user) {
         res.status(NOT_FOUND).send({ message: 'Такого пользователя нет' });
         return;
       }
-      if (err.name === 'ValidationError') {
+      res.status(OK).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
         return;
       }

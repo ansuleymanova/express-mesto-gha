@@ -32,7 +32,7 @@ function deleteCard(req, res) {
         res.status(NOT_FOUND).send({ message: 'Такой карточки нет' });
         return;
       }
-      res.status(OK).send({});
+      res.status(OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
