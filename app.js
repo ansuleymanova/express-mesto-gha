@@ -49,7 +49,7 @@ app.use('*', (req, res, next) => {
   const error = new BadRequestError('Такой страницы не существует');
   next(error);
 });
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   if (!err.statusCode) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
   }
