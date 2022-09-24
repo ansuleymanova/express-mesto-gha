@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { INTERNAL_SERVER_ERROR } = require('./utils/status-codes');
+const { INTERNAL_SERVER_ERROR, NOT_FOUND } = require('./utils/status-codes');
 const BadRequestError = require('./errors/bad-request-err');
 
 const { PORT = 3000 } = process.env;
@@ -47,6 +47,7 @@ app.use(errors());
 
 app.use('*', (req, res, next) => {
   const error = new BadRequestError('Такой страницы не существует');
+  error.statusCode(NOT_FOUND);
   next(error);
 });
 app.use((err, req, res, next) => {
