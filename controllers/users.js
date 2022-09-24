@@ -60,7 +60,8 @@ function createUser(req, res, next) {
         .then((user) => res.status(OK).send(user))
         .catch((err) => {
           if (err.code === 11000) {
-            const newErr = new Error('Пользователь с такой почтой уже зарегистрирован');
+            const newErr = new Error();
+            newErr.responseObject = { message: 'Пользователь с такой почтой уже зарегистрирован' };
             newErr.statusCode = 409;
             next(newErr);
           }
