@@ -53,7 +53,7 @@ app.use((err, req, res) => {
   if (!err.statusCode) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
   }
-  res.status(err.statusCode).send({ message: err.message });
+  res.status(err.statusCode).send({ message: err.responseObject });
 });
 
 app.listen(PORT);
