@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { INTERNAL_SERVER_ERROR, NOT_FOUND } = require('./utils/status-codes');
+const { INTERNAL_SERVER_ERROR } = require('./utils/status-codes');
 const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
