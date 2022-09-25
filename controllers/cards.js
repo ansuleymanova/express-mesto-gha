@@ -31,7 +31,7 @@ function deleteCard(req, res, next) {
       if (!card) {
         throw new NotFoundError('Такого пользователя нет');
       }
-      if (req.user._id !== card.owner._id) {
+      if (req.user._id !== card.owner.toString()) {
         throw new ForbiddenError('Удалить чужую карточку нельзя');
       }
       card.remove();
