@@ -6,7 +6,7 @@ const { celebrate, Joi, errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { INTERNAL_SERVER_ERROR, NOT_FOUND } = require('./utils/status-codes');
-const BadRequestError = require('./errors/bad-request-err');
+const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 
@@ -46,8 +46,7 @@ app.use('/cards', auth, require('./routes/cards'));
 app.use(errors());
 
 app.use('*', (req, res, next) => {
-  const error = new BadRequestError('Такой страницы не существует');
-  error.statusCode(NOT_FOUND);
+  const error = new NotFoundError('Такой страницы не существует');
   next(error);
 });
 app.use((err, req, res, next) => {
