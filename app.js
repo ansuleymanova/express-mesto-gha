@@ -7,7 +7,6 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { INTERNAL_SERVER_ERROR } = require('./utils/status-codes');
 const NotFoundError = require('./errors/not-found-err');
-const UnauthorizedError = require('./errors/unauthorized-err');
 
 const { PORT = 3000 } = process.env;
 
@@ -57,14 +56,8 @@ app.use((err, req, res, next) => {
 });
 
 app.use('*', (req, res) => {
-  const { authorization } = req.headers;
-  if (!authorization) {
-    const newErr = new UnauthorizedError('Необходима авторизация');
-    res.status(newErr.statusCode).send(newErr.responseObject);
-  } else {
-    const error = new NotFoundError('Такой страницы не существует');
-    res.status(error.statusCode).send(error.responseObject);
-  }
+  const error = new NotFoundError('Такой страницы не существует');
+  res.status(error.statusCode).send(error.responseObject);
 });
 
 app.listen(PORT);
