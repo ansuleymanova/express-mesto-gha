@@ -45,19 +45,16 @@ app.use('/cards', auth, require('./routes/cards'));
 
 app.use(errors());
 
+app.use('*', (req, res, next) => {
+  const error = new NotFoundError('Такой страницы не существует');
+  next(error);
+});
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
   }
-  if (err.statusCode === 404) {
-    next(err);
-  }
   res.status(err.statusCode).send(err.responseObject);
-});
-
-app.use('*', (req, res) => {
-  const error = new NotFoundError('Такой страницы не существует');
-  res.status(error.statusCode).send(error.responseObject);
+  next(err);
 });
 
 app.listen(PORT);
