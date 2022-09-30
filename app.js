@@ -40,8 +40,9 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/users', auth, require('./routes/users'));
-app.use('/cards', auth, require('./routes/cards'));
+app.use(auth);
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use(errors());
 
@@ -50,12 +51,12 @@ app.use('*', (req, res, next) => {
   next(error);
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (!err.statusCode) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
   }
   res.status(err.statusCode).send(err.responseObject);
-  next(err);
 });
 
 app.listen(PORT);

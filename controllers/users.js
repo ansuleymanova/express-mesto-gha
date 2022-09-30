@@ -134,7 +134,7 @@ function login(req, res, next) {
         { expiresIn: '7d' },
       );
       res.send({ token });
-    });
+    }).catch(next);
   }).catch((err) => {
     if (err.name === 'CastError' || err.name === 'ValidationError') {
       const newErr = new BadRequestError('Переданы некорректные данные');
